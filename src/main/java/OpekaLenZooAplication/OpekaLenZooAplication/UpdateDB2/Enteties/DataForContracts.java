@@ -1,9 +1,5 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties;
 
-import com.ibm.icu.text.RuleBasedNumberFormat;
-
-import java.util.Locale;
-
 public class DataForContracts {
     private String name;
     private String contractNumber;

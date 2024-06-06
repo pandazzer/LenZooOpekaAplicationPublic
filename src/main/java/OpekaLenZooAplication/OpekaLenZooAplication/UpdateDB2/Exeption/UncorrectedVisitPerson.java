@@ -2,8 +2,8 @@ package OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption;
 
 import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
 
-public class UncorrectVistPerson extends Exception {
-    public UncorrectVistPerson(){
+public class UncorrectedVisitPerson extends Exception {
+    public UncorrectedVisitPerson(){
         super(Constants.VisitPersonExeption);
     }
 }

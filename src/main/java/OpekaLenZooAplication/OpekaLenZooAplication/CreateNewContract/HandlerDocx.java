@@ -1,14 +1,13 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract;
 
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileExeption;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileException;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectException;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.DataForContracts;
 import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.RuleBasedNumberFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +33,7 @@ public abstract class HandlerDocx {
         MONTH.add("декабрь");
     }
 
-    abstract void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectExeption, ExistFileExeption;
+    abstract void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectException, ExistFileException;
 
     protected String getWordRuble(int ruble) {
         return String.format("%s (%s) %s",

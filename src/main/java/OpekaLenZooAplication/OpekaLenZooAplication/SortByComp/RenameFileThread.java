@@ -1,7 +1,7 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.SortByComp;
 
 import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
-import OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.Exeptions.RenameExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.Exeptions.RenameException;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.ReturnCompany;
 
 import java.io.File;
@@ -20,7 +20,7 @@ public class RenameFileThread implements Callable<ReturnCompany> {
     }
 
     @Override
-    public ReturnCompany call() throws RenameExeption {
+    public ReturnCompany call() throws RenameException {
         String companyName = getCompanyName(file);
         String correctCompany = getCorrectCompanyFile(companyName);
         renameFile(file, correctCompany);
@@ -47,7 +47,7 @@ public class RenameFileThread implements Callable<ReturnCompany> {
         }
     }
 
-    private void renameFile(File file, String correctCompany) throws RenameExeption {
+    private void renameFile(File file, String correctCompany) throws RenameException {
         if (!file.renameTo(new File(String.format("%s/%s.png"
                 , file.getParent()
                 , correctCompany)))) {
@@ -55,10 +55,10 @@ public class RenameFileThread implements Callable<ReturnCompany> {
         }
     }
 
-    private void renameDuplicateFile(File file, String correctCompany) throws RenameExeption {
+    private void renameDuplicateFile(File file, String correctCompany) throws RenameException {
         for (int i = 2; i < 70; i++) {
             if (i == 69) {
-                throw new RenameExeption();
+                throw new RenameException();
             }
             if (file.renameTo(new File(String.format("%s/%s_(%d).png"
                     , file.getParent()

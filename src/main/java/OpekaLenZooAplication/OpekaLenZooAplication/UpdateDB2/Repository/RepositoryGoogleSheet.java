@@ -6,7 +6,7 @@ import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.DataForCon
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.Individual;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.LegalPerson;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.NotFoundDataForContract;
-import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.UncorrectVistPerson;
+import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.UncorrectedVisitPerson;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.GoogleSheetsStart;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.GoogleWithoutToken;
 import com.google.api.services.sheets.v4.Sheets;
@@ -22,7 +22,6 @@ public class RepositoryGoogleSheet {
 
     private List<List<Object>> valuesCurators;
     private List<List<Object>> valuesContracts;
-    private List<List<Object>> valuesAnimals;
 
 
     public RepositoryGoogleSheet() {
@@ -69,7 +68,7 @@ public class RepositoryGoogleSheet {
         return listResult;
     }
 
-    public DataForContracts getDataForContract(String numberOfContract) throws NotFoundDataForContract, UncorrectVistPerson {
+    public DataForContracts getDataForContract(String numberOfContract) throws NotFoundDataForContract, UncorrectedVisitPerson {
         for (List<Object> contract : valuesContracts) {
             if (contract.get(0).equals(numberOfContract) && contract.size() > 11) {
                 String name = contract.get(1).toString();
@@ -119,7 +118,7 @@ public class RepositoryGoogleSheet {
                                         + "."
                                         + nameArray[nameArray.length - 1].charAt(0)
                                         + ".";
-                                default -> throw new UncorrectVistPerson();
+                                default -> throw new UncorrectedVisitPerson();
                             }
                             String post = curator.get(11).toString();
                             String reason = curator.get(12).toString();
@@ -141,26 +140,5 @@ public class RepositoryGoogleSheet {
             }
         }
         throw new NotFoundDataForContract();
-    }
-
-    public List<String> getCurators() {
-        List<String> result = new ArrayList<>();
-        for (List<Object> contract : valuesContracts) {
-            if (contract.size() > 1) {
-                String name = contract.get(1).toString();
-                for (List<Object> curator : valuesCurators) {
-                    if (curator.get(0).equals(name)) {
-                        String nameForCert = curator.get(1).toString();
-                        if (nameForCert.isEmpty()) {
-                            result.add(curator.get(0).toString());
-                        } else {
-                            result.add(nameForCert.trim());
-                        }
-
-                    }
-                }
-            }
-        }
-        return result;
     }
 }

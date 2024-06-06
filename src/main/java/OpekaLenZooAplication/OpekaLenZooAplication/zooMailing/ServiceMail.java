@@ -42,7 +42,7 @@ public class ServiceMail {
             String address;
             try {
                 address = repository.getMailByPath(path);
-            } catch (NotMailExeption e) {
+            } catch (NotMailException e) {
                 continue;
             }
             bookkeepingExist = new ArrayList<>();

@@ -2,16 +2,16 @@ package OpekaLenZooAplication.OpekaLenZooAplication.Controllers;
 
 import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
 import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.CreateDocxService;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileExeption;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileException;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectException;
 import OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.DeleteScanInDirectory;
 import OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.RenamePNGFiles;
 import OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.SortService;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.NotFoundDataForContract;
-import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.UncorrectVistPerson;
+import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Exeption.UncorrectedVisitPerson;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.ServiceDB;
 import OpekaLenZooAplication.OpekaLenZooAplication.zooMailing.H2Repository;
-import OpekaLenZooAplication.OpekaLenZooAplication.zooMailing.NotMailExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.zooMailing.NotMailException;
 import OpekaLenZooAplication.OpekaLenZooAplication.zooMailing.POJO.MailPojo;
 import OpekaLenZooAplication.OpekaLenZooAplication.zooMailing.ServiceMail;
 import javafx.collections.FXCollections;
@@ -154,7 +154,7 @@ public class GenController {
             showAlert("Договор создан!");
         } catch (NotFoundDataForContract e) {
             showAlert("Ошибка создания договора" + e);
-        } catch (IncorrectExeption | ExistFileExeption | UncorrectVistPerson e) {
+        } catch (IncorrectException | ExistFileException | UncorrectedVisitPerson e) {
             showAlert(e.getMessage());
         }
     }
@@ -201,7 +201,7 @@ public class GenController {
 
                     try {
                         repository.getMailByPath(path);
-                    } catch (NotMailExeption e) {
+                    } catch (NotMailException e) {
                         curratorsArea.appendText("(0)-");
                         showAlert(path + " " + e.getMessage());
                     }

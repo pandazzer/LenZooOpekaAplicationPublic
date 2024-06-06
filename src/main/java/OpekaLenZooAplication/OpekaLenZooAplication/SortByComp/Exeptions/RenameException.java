@@ -1,4 +1,4 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.SortByComp.Exeptions;
 
-public class RenameExeption extends Exception{
+public class RenameException extends Exception{
 }

@@ -1,7 +1,7 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract;
 
 import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileException;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.DataForContracts;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.Individual;
 
@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class IndividualHandler extends HandlerDocx {
 
     @Override
-    public void replaceSample(DataForContracts dataForContracts) throws IOException, ExistFileExeption {
+    public void replaceSample(DataForContracts dataForContracts) throws IOException, ExistFileException {
         InputStream in = getClass().getClassLoader().getResourceAsStream(Constants.exampleInFace);
         XWPFDocumentOpeka inDoc = new XWPFDocumentOpeka(in);
         Individual individual = (Individual) dataForContracts;

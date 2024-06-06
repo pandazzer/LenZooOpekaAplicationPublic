@@ -2,8 +2,8 @@ package OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract;
 
 import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
 import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Entety.CompanyShort;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileExeption;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileException;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.IncorrectException;
 import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Repository.RepositoryDaData;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.DataForContracts;
 import OpekaLenZooAplication.OpekaLenZooAplication.UpdateDB2.Enteties.LegalPerson;
@@ -26,7 +26,7 @@ public class LegalPersonHandler extends HandlerDocx {
 
 
     @Override
-    public void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectExeption, ExistFileExeption {
+    public void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectException, ExistFileException {
         Client clientForTransWord = new ClientBuilder().build();
         InputStream in = getClass().getClassLoader().getResourceAsStream(Constants.exampleUrFace);
         XWPFDocumentOpeka urDoc = new XWPFDocumentOpeka(in);
@@ -124,7 +124,7 @@ public class LegalPersonHandler extends HandlerDocx {
             for (String str : unCorrectList) {
                 stringBuilder.append(str);
             }
-            throw new IncorrectExeption(stringBuilder.toString());
+            throw new IncorrectException(stringBuilder.toString());
         }
     }
 

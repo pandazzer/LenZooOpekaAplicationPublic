@@ -1,7 +1,6 @@
 package OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract;
 
-import OpekaLenZooAplication.OpekaLenZooAplication.Constants;
-import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileExeption;
+import OpekaLenZooAplication.OpekaLenZooAplication.CreateNewContract.Exeption.ExistFileException;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 
@@ -83,12 +82,12 @@ public class XWPFDocumentOpeka extends XWPFDocument {
         }
     }
 
-    public void save(String path, String nameDocx) throws ExistFileExeption {
+    public void save(String path, String nameDocx) throws ExistFileException {
         File newContractsPath = new File(path);
         File newContracts = new File(path + "/" + nameDocx.replace("\"",""));
         if (!newContractsPath.exists()) newContractsPath.mkdir();
         if (newContracts.exists()){
-            throw new ExistFileExeption();
+            throw new ExistFileException();
         }
         try {
             FileOutputStream outputStream = new FileOutputStream(newContracts);

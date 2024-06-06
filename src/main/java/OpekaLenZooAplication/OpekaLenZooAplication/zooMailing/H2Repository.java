@@ -50,7 +50,7 @@ public class H2Repository {
 
     }
 
-    public String getMailByPath(String path) throws NotMailExeption {
+    public String getMailByPath(String path) throws NotMailException {
         try {
             PreparedStatement statement = connection.prepareStatement("SELECT mail FROM curators WHERE path = ?");
             statement.setString(1, path);
@@ -59,7 +59,7 @@ public class H2Repository {
                 return resultSet.getString(1);
             } else {
                 log.info(String.format("%-50s - Данные не найдены", path));
-                throw new NotMailExeption();
+                throw new NotMailException();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
