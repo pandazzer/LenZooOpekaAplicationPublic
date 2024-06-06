@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>OpekaLenZooAplication</groupId>
-	<artifactId>OpekaLenZooAplication</artifactId>
+	<artifactId>OpekaLenZooApplication</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>OpekaLenZooAplication</name>
 	<description> OpekaLenZooAplication </description>
