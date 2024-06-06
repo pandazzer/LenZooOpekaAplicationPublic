@@ -32,7 +32,7 @@ public class Config {
         return new SpringFxWeaver(applicationContext);
     }
     @Bean
-    public void checkENV() throws EnvironmentNullExeption {
+    public void checkENV() throws EnvironmentNullException {
         Map<String, String> envMap = new HashMap<>();
         envMap.put("passwordEmail", Constants.password);
         envMap.put("pathDB", Constants.pathDB);
@@ -41,7 +41,7 @@ public class Config {
         envMap.put("tokenDaData", System.getProperty("tokenDaData"));
         for (Map.Entry<String, String> env : envMap.entrySet()) {
             if (env.getValue() == null || env.getValue().isEmpty()) {
-                throw new EnvironmentNullExeption(env.getKey() + " = null or empty");
+                throw new EnvironmentNullException(env.getKey() + " = null or empty");
             }
             System.out.println(env.getValue());
         }
