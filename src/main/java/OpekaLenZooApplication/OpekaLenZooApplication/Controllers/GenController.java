@@ -24,10 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 @FxmlView("/maket/12.fxml")
@@ -154,7 +151,9 @@ public class GenController {
             showAlert("Договор создан!");
         } catch (NotFoundDataForContract e) {
             showAlert("Ошибка создания договора" + e);
-        } catch (IncorrectException | ExistFileException | UncorrectedVisitPerson e) {
+        } catch (ExistFileException e) {
+            showYesNoButton(e.getMessage() + "Перезаписать?");
+        } catch (IncorrectException | UncorrectedVisitPerson e) {
             showAlert(e.getMessage());
         }
     }
@@ -237,7 +236,7 @@ public class GenController {
                     bookkeepingNotExist.add(bookkeeping.replace("\\", "!").split("!")[1]);
                 }
             }
-            if (isBookkeepingExist && countExist != bookkeepingList.size()){
+            if (isBookkeepingExist && countExist != bookkeepingList.size()) {
                 curratorsArea.appendText(String.format("%s нет:" + bookkeepingNotExist + "\n", curatorDir.getName()));
             }
         }
@@ -271,7 +270,15 @@ public class GenController {
     }
 
     private void showAlert(String text) {
-        new Alert(Alert.AlertType.WARNING, text).showAndWait();
+        new Alert(Alert.AlertType.INFORMATION, text).showAndWait();
+    }
+
+    private Optional<ButtonType> showYesNoButton(String text) {
+        return new Alert(Alert.AlertType.WARNING
+                , text
+                , ButtonType.YES
+                , ButtonType.NO)
+                .showAndWait();
     }
 
     public void setRenameProgBar(double prog) {
