@@ -16,6 +16,8 @@ public abstract class HandlerDocx {
     private final RuleBasedNumberFormat nf = new RuleBasedNumberFormat(Locale.forLanguageTag("ru"),
             RuleBasedNumberFormat.SPELLOUT);
     protected final List<String> MONTH = new ArrayList<>();
+    protected boolean ignoreExistFileException = false;
+    protected DataForContracts dataForContracts;
 
     public HandlerDocx(){
         MONTH.add("");
@@ -33,7 +35,7 @@ public abstract class HandlerDocx {
         MONTH.add("декабрь");
     }
 
-    abstract void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectException, ExistFileException;
+    abstract void replaceSampleAndSave() throws IOException, IncorrectException, ExistFileException;
 
     protected String getWordRuble(int ruble) {
         return String.format("%s (%s) %s",
@@ -61,5 +63,13 @@ public abstract class HandlerDocx {
     protected String getSplitSumString(int sum){
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
         return decimalFormat.format(sum);
+    }
+
+    public void setIgnoreExistFileException(boolean ignoreExistFileException) {
+        this.ignoreExistFileException = ignoreExistFileException;
+    }
+
+    public void setDataForContracts(DataForContracts dataForContracts) {
+        this.dataForContracts = dataForContracts;
     }
 }

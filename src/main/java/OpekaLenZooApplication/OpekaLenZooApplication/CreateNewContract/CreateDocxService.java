@@ -19,6 +19,7 @@ import java.util.Date;
 public class CreateDocxService {
     @Autowired
     private RepositoryGoogleSheet repositoryGoogleSheet;
+    private boolean ignoreExistFileException = false;
 
     public void createContract(String contractNumber) throws NotFoundDataForContract, IncorrectException, ExistFileException, UncorrectedVisitPerson {
         repositoryGoogleSheet.updateDataGoogleSheet();
@@ -27,14 +28,22 @@ public class CreateDocxService {
         Date date = new Date();
         DateFormat df = new SimpleDateFormat("«dd» MMMM yyyy г.");
         dataForContracts.setMonth(df.format(date));
+        HandlerDocx handlerDocx;
+        if (dataForContracts.isIndividual()) {
+            handlerDocx = new IndividualHandler();
+        } else {
+            handlerDocx = new LegalPersonHandler();
+        }
+        handlerDocx.setIgnoreExistFileException(ignoreExistFileException);
+        handlerDocx.setDataForContracts(dataForContracts);
         try {
-            if (dataForContracts.isIndividual()) {
-                new IndividualHandler().replaceSample(dataForContracts);
-            } else {
-                new LegalPersonHandler().replaceSample(dataForContracts);
-            }
+            handlerDocx.replaceSampleAndSave();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setIgnoreExistFileException(boolean ignoreExistFileException) {
+        this.ignoreExistFileException = ignoreExistFileException;
     }
 }

@@ -82,17 +82,15 @@ public class XWPFDocumentOpeka extends XWPFDocument {
         }
     }
 
-    public void save(String path, String nameDocx) throws ExistFileException {
+    public void save(String path, String nameDocx, boolean ignoreException) throws ExistFileException {
         File newContractsPath = new File(path);
         File newContracts = new File(path + "/" + nameDocx.replace("\"",""));
         if (!newContractsPath.exists()) newContractsPath.mkdir();
-        if (newContracts.exists()){
+        if (newContracts.exists() && !ignoreException){
             throw new ExistFileException();
         }
-        try {
-            FileOutputStream outputStream = new FileOutputStream(newContracts);
+        try (var outputStream = new FileOutputStream(newContracts)) {
             this.write(outputStream);
-            outputStream.close();
         } catch (IOException e) {
             System.out.println("Не удалось сохранить договор");
         }

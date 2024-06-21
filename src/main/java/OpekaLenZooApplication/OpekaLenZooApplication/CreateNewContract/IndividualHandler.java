@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class IndividualHandler extends HandlerDocx {
 
     @Override
-    public void replaceSample(DataForContracts dataForContracts) throws IOException, ExistFileException {
+    public void replaceSampleAndSave() throws IOException, ExistFileException {
         InputStream in = getClass().getClassLoader().getResourceAsStream(Constants.exampleInFace);
         XWPFDocumentOpeka inDoc = new XWPFDocumentOpeka(in);
         Individual individual = (Individual) dataForContracts;
@@ -68,6 +68,7 @@ public class IndividualHandler extends HandlerDocx {
         inDoc.replace("SIGNNAME", individual.getSignName());
         inDoc.replace("BILLET", individual.getBillet());
         inDoc.save(Constants.NEW_CONTRACTS_PATH + MONTH.get(numberMonth) + "_" + year
-                ,dataForContracts.getContractNumber() + " " + individual.getName() + ".docx");
+                ,dataForContracts.getContractNumber() + " " + individual.getName() + ".docx"
+                , ignoreExistFileException);
     }
 }

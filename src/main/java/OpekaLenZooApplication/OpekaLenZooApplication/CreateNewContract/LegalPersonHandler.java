@@ -26,13 +26,13 @@ public class LegalPersonHandler extends HandlerDocx {
 
 
     @Override
-    public void replaceSample(DataForContracts dataForContracts) throws IOException, IncorrectException, ExistFileException {
+    public void replaceSampleAndSave() throws IOException, IncorrectException, ExistFileException {
         Client clientForTransWord = new ClientBuilder().build();
         InputStream in = getClass().getClassLoader().getResourceAsStream(Constants.exampleUrFace);
         XWPFDocumentOpeka urDoc = new XWPFDocumentOpeka(in);
         LegalPerson legalPerson = (LegalPerson) dataForContracts;
         CompanyShort companyShort = repositoryDaData.getCorrectCompany(legalPerson.getINN());
-        fillUncorrectList(legalPerson, companyShort);
+        fillUncorrectedList(legalPerson, companyShort);
 
         String allSum = getWordRuble(legalPerson.getSum());
         String allSumNDS = getWordRuble(legalPerson.getSum() / 6);
@@ -117,7 +117,8 @@ public class LegalPersonHandler extends HandlerDocx {
         urDoc.replace("SIGNNAME", legalPerson.getSignName());
         urDoc.replace("BILLET", legalPerson.getBillet());
         urDoc.save(Constants.NEW_CONTRACTS_PATH + MONTH.get(numberMonth) + "_" + year
-                , dataForContracts.getContractNumber() + " " + legalPerson.getName() + ".docx");
+                , dataForContracts.getContractNumber() + " " + legalPerson.getName() + ".docx"
+                , ignoreExistFileException);
 
         if (!unCorrectList.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -128,7 +129,7 @@ public class LegalPersonHandler extends HandlerDocx {
         }
     }
 
-    private void fillUncorrectList(LegalPerson legalPerson, CompanyShort companyShort) {
+    private void fillUncorrectedList(LegalPerson legalPerson, CompanyShort companyShort) {
         unCorrectList.add("Статус - " + companyShort.getStatus() + "\n");
         check(companyShort.getShortCompanyName(), legalPerson.getName());
         check(companyShort.getOkpo(), legalPerson.getOKPO());

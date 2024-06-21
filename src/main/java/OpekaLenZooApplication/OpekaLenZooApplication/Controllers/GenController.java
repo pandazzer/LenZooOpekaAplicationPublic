@@ -152,10 +152,28 @@ public class GenController {
         } catch (NotFoundDataForContract e) {
             showAlert("Ошибка создания договора" + e);
         } catch (ExistFileException e) {
-            showYesNoButton(e.getMessage() + "Перезаписать?");
+            if (getYesNoButton(e.getMessage() + " Перезаписать?").get() == ButtonType.YES) {
+                forceCreateContract();
+            }
         } catch (IncorrectException | UncorrectedVisitPerson e) {
             showAlert(e.getMessage());
         }
+    }
+
+    private void forceCreateContract() {
+        try {
+            createService.setIgnoreExistFileException(true);
+            createService.createContract(txtcr.getText());
+            createService.setIgnoreExistFileException(false);
+            showAlert("Договор создан!");
+        } catch (ExistFileException ignored) {
+        } catch (NotFoundDataForContract e) {
+            throw new RuntimeException(e);
+        } catch (IncorrectException | UncorrectedVisitPerson e) {
+            showAlert(e.getMessage());
+        }
+
+
     }
 
     private void handleGetDataButton() {
@@ -273,7 +291,7 @@ public class GenController {
         new Alert(Alert.AlertType.INFORMATION, text).showAndWait();
     }
 
-    private Optional<ButtonType> showYesNoButton(String text) {
+    private Optional<ButtonType> getYesNoButton(String text) {
         return new Alert(Alert.AlertType.WARNING
                 , text
                 , ButtonType.YES
