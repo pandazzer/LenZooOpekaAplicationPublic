@@ -10,8 +10,10 @@ import OpekaLenZooApplication.OpekaLenZooApplication.SortByComp.SortService;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.Exeption.NotFoundDataForContract;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.Exeption.UncorrectedVisitPerson;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.ServiceDB;
+import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ENUM.StatusCurator;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.H2Repository;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.NotMailException;
+import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.CuratorsBookkeeping;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.MailPojo;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ServiceMail;
 import javafx.collections.FXCollections;
@@ -199,28 +201,19 @@ public class GenController {
     }
 
     private void appendCorrectCuratorsToArea() {
-        List<String> bookkeepingList = List.of(directoryMailFilesField.getText().split(","));
-        for (File curatorDir : Objects.requireNonNull(new File(Constants.curatorsDirectoryPath).listFiles())) {
-            for (String bookkeeping : bookkeepingList) {
-                File curBookkeeping = new File(curatorDir.getPath() + "/" + bookkeeping);
-                if (curBookkeeping.exists()) {
-                    String path = curatorDir.getName();
+        String[] bookkeepingList = directoryMailFilesField.getText().split(",");
+        List<CuratorsBookkeeping> curatorsBookkeepingList = serviceMail.getFoundCorrectCurators(bookkeepingList);
 
-                    try {
-                        repository.getMailByPath(path);
-                    } catch (NotMailException e) {
-                        curratorsArea.appendText("(0)-");
-                        showAlert(path + " " + e.getMessage());
-                    }
-                    try {
-                        if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
-                            curratorsArea.appendText("(1)-");
-                        }
-                    } catch (SQLException ignored) {
-                    }
-                    curratorsArea.appendText(curatorDir.getName() + " " + bookkeeping + "\n");
-                }
+        for (CuratorsBookkeeping curatorsBookkeeping : curatorsBookkeepingList) {
+            String name = curatorsBookkeeping.curator().getName();
+            if (curatorsBookkeeping.status() == StatusCurator.NO_MAIL) {
+                curratorsArea.appendText("(0)-");
+                showAlert(name + " " + Constants.NOT_MAIL_MESSAGE);
             }
+            if (curatorsBookkeeping.status() == StatusCurator.ALREADY_SEND) {
+                curratorsArea.appendText("(1)-");
+            }
+            curratorsArea.appendText(name + " " + bookkeeping + "\n");
         }
     }
 

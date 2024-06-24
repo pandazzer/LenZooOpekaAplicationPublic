@@ -66,14 +66,19 @@ public class H2Repository {
         }
     }
 
-    public boolean isSend(String path, String bookkeeping) throws SQLException {
+    public boolean isSend(String path, String bookkeeping) {
         if (bookkeeping.equals("")) {
             return false;
         }
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(String.format("SELECT %s FROM curators WHERE path = '%s'", bookkeeping, path));
-        resultSet.next();
-        return resultSet.getBoolean(1);
+
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT %s FROM curators WHERE path = '%s'", bookkeeping, path));
+            resultSet.next();
+            return resultSet.getBoolean(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addColumn(List<String> bookkeepingList) {
