@@ -3,6 +3,8 @@ package OpekaLenZooApplication.OpekaLenZooApplication.zooMailing;
 
 import OpekaLenZooApplication.OpekaLenZooApplication.Constants;
 import OpekaLenZooApplication.OpekaLenZooApplication.Controllers.GenController;
+import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ENUM.StatusCurator;
+import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.CuratorsBukkeeping;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.MailPojo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +25,7 @@ public class ServiceMail {
     private H2Repository repository;
     private List<String> bookkeepingExist;  //переменная следит за найдеными папками и добавлет список в бд
     private final Logger log = LogManager.getLogger();
+    private List<CuratorsBukkeeping> correctCurators;
 
     @Async
     public void startService(MailPojo mailPojo, GenController genController) {
@@ -46,7 +49,7 @@ public class ServiceMail {
                 continue;
             }
             bookkeepingExist = new ArrayList<>();
-            List<File> listFilePath = getListFilePath(curatorDir, mailPojo.bookkeepingList, path);
+            List<File> listFilePath = getListFilePath(curatorDir, mailPojo.bookkeepingList);
             if (address != null && !listFilePath.isEmpty()) {
                 try {
                     sendMessage.send(address, mailPojo.subject, mailPojo.text, listFilePath);
@@ -69,12 +72,14 @@ public class ServiceMail {
         genController.addLogText(String.format("%d - успешно отправлено%n%d - уже было отправлено", correctSendCount, alreadySendCount));
     }
 
-    private List<File> getListFilePath(File curatorDir, List<String> bookkeepingList, String path) {
+    private List<File> getListFilePath(File curatorDir, List<String> bookkeepingList) {
         List<File> listFiles = new ArrayList<>();
         for (String bookkeeping : bookkeepingList) {
             File curBookkeeping = new File(curatorDir.getPath() + "\\" + bookkeeping);
             try {
-                if (curBookkeeping.exists() && !repository.isSend(path, bookkeeping.replace("\\", "_"))) {
+                if (curBookkeeping.exists()
+                        && !repository.isSend(curatorDir.getName()
+                        , bookkeeping.replace("\\", "_"))) {
                     bookkeepingExist.add(bookkeeping);
                     for (File file : Objects.requireNonNull(curBookkeeping.listFiles())) {
                         if (file.getName().equals("Thumbs.db")) {
@@ -101,6 +106,29 @@ public class ServiceMail {
         for (String path : blackList) {
             for (String bookkeeping : bookkeepingList) {
                 repository.setBooleanTrueWithColumn(path, bookkeeping.replace("\\", "_"));
+            }
+        }
+    }
+    public void findCorrectCurators () {
+        List<String> bookkeepingList = List.of(directoryMailFilesField.getText().split(","));
+        StatusCurator statusCurator;
+        for (File curatorDir : Objects.requireNonNull(new File(Constants.curatorsDirectoryPath).listFiles())) {
+            for (String bookkeeping : bookkeepingList) {
+                File curBookkeeping = new File(curatorDir.getPath() + "/" + bookkeeping);
+                if (curBookkeeping.exists()) {
+                    String path = curatorDir.getName();
+                    try {
+                        repository.getMailByPath(path);
+                        if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
+
+                        }
+                    } catch (NotMailException e) {
+                        correctCurators
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    curratorsArea.appendText(curatorDir.getName() + " " + bookkeeping + "\n");
+                }
             }
         }
     }

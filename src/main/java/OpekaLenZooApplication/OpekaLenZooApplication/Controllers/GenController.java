@@ -95,16 +95,6 @@ public class GenController {
     @FXML
     private ChoiceBox<String> chBox;
     @FXML
-    private TextArea waste;
-    @FXML
-    private TextArea absent;
-    @FXML
-    private Button crListSite;
-    @FXML
-    private TextArea findDone;
-    @FXML
-    private TextField sitePathField;
-    @FXML
     private Button clearLogs;
     @FXML
     private Button deleteScanButton;
