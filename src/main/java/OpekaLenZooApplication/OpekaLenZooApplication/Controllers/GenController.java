@@ -10,11 +10,8 @@ import OpekaLenZooApplication.OpekaLenZooApplication.SortByComp.SortService;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.Exeption.NotFoundDataForContract;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.Exeption.UncorrectedVisitPerson;
 import OpekaLenZooApplication.OpekaLenZooApplication.UpdateDB2.ServiceDB;
-import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ENUM.StatusCurator;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.H2Repository;
-import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.NotMailException;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.CuratorsBookkeeping;
-import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.MailPojo;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ServiceMail;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.*;
 
 @Component
@@ -119,7 +115,7 @@ public class GenController {
         renameButton.setOnAction(e -> handleRenameButton());
         sortButton.setOnAction(e -> handleSortButton());
         createListKit.setOnAction(e -> handleCreateListKit());
-        createCurratorsListButton.setOnAction(e -> handleCurratorsListButton());
+        createCurratorsListButton.setOnAction(e -> handleCuratorsListButton());
         sendButton.setOnAction(e -> handleSendButton());
         getDataButton.setOnAction(e -> handleGetDataButton());
         cr.setOnAction(e -> handleCreateButton());
@@ -178,14 +174,19 @@ public class GenController {
         String subject = subjectField.getText();
         String text = mailTextField.getText();
         String[] blackList = blackListArea.getText().split("\n");
+        HashSet<String> blackListSet = new HashSet<>(Arrays.asList(blackList));
         String[] bookkeepingList = directoryMailFilesField.getText().split(",");
-        if (isEmptyField(subject) || isEmptyField(text) || isEmptyField(bookkeepingList.get(0))) {
+        if (isEmptyField(subject) || isEmptyField(text) || isEmptyField(bookkeepingList[0])) {
             return;
         }
+        serviceMail.setSubject(subject);
+        serviceMail.setText(text);
+        serviceMail.setBlackList(blackListSet);
+        serviceMail.setBookkeepingList(bookkeepingList);
         serviceMail.startService( this);
     }
 
-    private void handleCurratorsListButton() {
+    private void handleCuratorsListButton() {
         curratorsArea.clear();
         updateDB();
         appendCorrectCuratorsToArea();
@@ -211,6 +212,9 @@ public class GenController {
                     showAlert(name + " " + Constants.NOT_MAIL_MESSAGE);
                 }
                 case ALREADY_SEND -> curratorsArea.appendText("(1)-");
+                case IN_BLACK_LIST -> {
+                    continue;
+                }
             }
             curratorsArea.appendText(name + " " + curatorsBookkeeping.bookkeeping() + "\n");
         }
@@ -238,7 +242,7 @@ public class GenController {
             }
             if (isBookkeepingExist && countExist != bookkeepingList.size()) {
                 curratorsArea.appendText(String.format("%s нет:" + bookkeepingNotExist + "\n", curatorDir.getName()));
-            }
+            }//*
         }
     }
 

@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class ServiceMail {
@@ -28,15 +25,12 @@ public class ServiceMail {
     private String[] bookkeepingList;
     private String subject;
     private String text;
-    private String[] blackList;
+    private HashSet<String> blackList;
 
     @Async
     public void startService(GenController genController) {
         SmtpSendMessage sendMessage = new SmtpSendMessage();
         repository.addColumn(List.of(bookkeepingList));
-        if (!blackList[0].isEmpty()) {
-            setBlackList(blackList, bookkeepingList);
-        }
         int correctSendCount = 0;
         int alreadySendCount = 0;
         double sumCount = 0;
@@ -47,10 +41,10 @@ public class ServiceMail {
             String name = curatorsBookkeeping.curator().getName();
             String address = curatorsBookkeeping.mailAddress();
             bookkeepingExist = new ArrayList<>();
-            List<File> listFilePath = getListFilePath(curatorsBookkeeping.curator(), mailPojo.bookkeepingList);
-            if (address != null && !listFilePath.isEmpty()) {
+            List<File> listFilePath = getListFilePath(curatorsBookkeeping.curator(), bookkeepingList);
+            if (!listFilePath.isEmpty()) {
                 try {
-                    sendMessage.send(address, mailPojo.subject, mailPojo.text, listFilePath);
+                    sendMessage.send(address, subject, text, listFilePath);
                     log.warn(name + " -> ");
                     listFilePath.stream().map(File::getName).forEach(log::warn);
                     setSendCorrect(name, bookkeepingExist);
@@ -70,7 +64,7 @@ public class ServiceMail {
         genController.addLogText(String.format("%d - успешно отправлено%n%d - уже было отправлено", correctSendCount, alreadySendCount));
     }
 
-    private List<File> getListFilePath(File curatorDir, List<String> bookkeepingList) {
+    private List<File> getListFilePath(File curatorDir, String[] bookkeepingList) {
         List<File> listFiles = new ArrayList<>();
         for (String bookkeeping : bookkeepingList) {
             File curBookkeeping = new File(curatorDir.getPath() + "\\" + bookkeeping);
@@ -89,9 +83,9 @@ public class ServiceMail {
         return listFiles;
     }
 
-    private void setSendCorrect(String path, List<String> bookkeepingList) {
+    private void setSendCorrect(String name, List<String> bookkeepingList) {
         for (String bookkeeping : bookkeepingList) {
-            repository.setBooleanTrueWithColumn(path, bookkeeping.replace("\\", "_"));
+            repository.setBooleanTrueWithColumn(name, bookkeeping.replace("\\", "_"));
         }
     }
 
@@ -121,6 +115,9 @@ public class ServiceMail {
                     if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
                         statusCurator = StatusCurator.ALREADY_SEND;
                     }
+                    if (blackList.contains(curatorDir.getName())) {
+                        statusCurator = StatusCurator.IN_BLACK_LIST;
+                    }
                     foundCorrectCurators.add(new CuratorsBookkeeping(curatorDir, bookkeeping, email, statusCurator));
                 }
             }
@@ -147,7 +144,7 @@ public class ServiceMail {
         this.text = text;
     }
 
-    public void setBlackList(String[] blackList) {
+    public void setBlackList(HashSet<String> blackList) {
         this.blackList = blackList;
     }
 }
