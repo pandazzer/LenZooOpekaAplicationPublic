@@ -177,13 +177,12 @@ public class GenController {
     private void handleSendButton() {
         String subject = subjectField.getText();
         String text = mailTextField.getText();
-        List<String> blackList = Arrays.stream(blackListArea.getText().split("\n")).toList();
-        List<String> bookkeepingList = List.of(directoryMailFilesField.getText().split(","));
+        String[] blackList = blackListArea.getText().split("\n");
+        String[] bookkeepingList = directoryMailFilesField.getText().split(",");
         if (isEmptyField(subject) || isEmptyField(text) || isEmptyField(bookkeepingList.get(0))) {
             return;
         }
-        MailPojo mailPojo = new MailPojo(subject, text, blackList, bookkeepingList);
-        serviceMail.startService(mailPojo, this);
+        serviceMail.startService( this);
     }
 
     private void handleCurratorsListButton() {
@@ -206,14 +205,14 @@ public class GenController {
 
         for (CuratorsBookkeeping curatorsBookkeeping : curatorsBookkeepingList) {
             String name = curatorsBookkeeping.curator().getName();
-            if (curatorsBookkeeping.status() == StatusCurator.NO_MAIL) {
-                curratorsArea.appendText("(0)-");
-                showAlert(name + " " + Constants.NOT_MAIL_MESSAGE);
+            switch (curatorsBookkeeping.status()) {
+                case NO_MAIL -> {
+                    curratorsArea.appendText("(0)-");
+                    showAlert(name + " " + Constants.NOT_MAIL_MESSAGE);
+                }
+                case ALREADY_SEND -> curratorsArea.appendText("(1)-");
             }
-            if (curatorsBookkeeping.status() == StatusCurator.ALREADY_SEND) {
-                curratorsArea.appendText("(1)-");
-            }
-            curratorsArea.appendText(name + " " + bookkeeping + "\n");
+            curratorsArea.appendText(name + " " + curatorsBookkeeping.bookkeeping() + "\n");
         }
     }
 

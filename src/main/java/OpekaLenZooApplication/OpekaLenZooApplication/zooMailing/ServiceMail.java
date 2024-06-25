@@ -5,7 +5,6 @@ import OpekaLenZooApplication.OpekaLenZooApplication.Constants;
 import OpekaLenZooApplication.OpekaLenZooApplication.Controllers.GenController;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ENUM.StatusCurator;
 import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.CuratorsBookkeeping;
-import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.POJO.MailPojo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,41 +24,39 @@ public class ServiceMail {
     private H2Repository repository;
     private List<String> bookkeepingExist;  //переменная следит за найдеными папками и добавлет список в бд
     private final Logger log = LogManager.getLogger();
-    private List<CuratorsBookkeeping> foundCorrectCurators = new ArrayList<>();
+    private List<CuratorsBookkeeping> foundCorrectCurators;
     private String[] bookkeepingList;
+    private String subject;
+    private String text;
+    private String[] blackList;
 
     @Async
-    public void startService(MailPojo mailPojo, GenController genController) {
-        File curatorsDirectory = new File(Constants.curatorsDirectoryPath);
+    public void startService(GenController genController) {
         SmtpSendMessage sendMessage = new SmtpSendMessage();
-        repository.addColumn(mailPojo.bookkeepingList);
-        if (!mailPojo.blackList.get(0).equals("")) {
-            setBlackList(mailPojo.blackList, mailPojo.bookkeepingList);
+        repository.addColumn(List.of(bookkeepingList));
+        if (!blackList[0].isEmpty()) {
+            setBlackList(blackList, bookkeepingList);
         }
         int correctSendCount = 0;
         int alreadySendCount = 0;
         double sumCount = 0;
-        int allFilesCount = Objects.requireNonNull(curatorsDirectory.listFiles()).length;
-        for (File curatorDir : Objects.requireNonNull(curatorsDirectory.listFiles())) {
+        int allFilesCount = foundCorrectCurators.size();
+        for (CuratorsBookkeeping curatorsBookkeeping : foundCorrectCurators) {
             sumCount++;
-            String path = curatorDir.getName();
-            String address;
-            try {
-                address = repository.getMailByPath(path);
-            } catch (NotMailException e) {
-                continue;
-            }
+            if (curatorsBookkeeping.status() != StatusCurator.OK) continue;
+            String name = curatorsBookkeeping.curator().getName();
+            String address = curatorsBookkeeping.mailAddress();
             bookkeepingExist = new ArrayList<>();
-            List<File> listFilePath = getListFilePath(curatorDir, mailPojo.bookkeepingList);
+            List<File> listFilePath = getListFilePath(curatorsBookkeeping.curator(), mailPojo.bookkeepingList);
             if (address != null && !listFilePath.isEmpty()) {
                 try {
                     sendMessage.send(address, mailPojo.subject, mailPojo.text, listFilePath);
-                    log.warn(path + " -> ");
+                    log.warn(name + " -> ");
                     listFilePath.stream().map(File::getName).forEach(log::warn);
-                    setSendCorrect(path, bookkeepingExist);
+                    setSendCorrect(name, bookkeepingExist);
                     correctSendCount++;
                 } catch (MessagingException e) {
-                    genController.addLogText(String.format(path + " -> "));
+                    genController.addLogText(String.format(name + " -> "));
                     genController.addLogText(String.format("%-50s - Ошибка отправки!!!", address));
                     log.warn(String.format("%-50s - Ошибка отправки!!!", address));
                     throw new RuntimeException(e);
@@ -99,7 +96,7 @@ public class ServiceMail {
     }
 
 
-    private void setBlackList(List<String> blackList, List<String> bookkeepingList) {
+    private void setBlackList(String[] blackList, String[] bookkeepingList) {
         for (String path : blackList) {
             for (String bookkeeping : bookkeepingList) {
                 repository.setBooleanTrueWithColumn(path, bookkeeping.replace("\\", "_"));
@@ -108,6 +105,7 @@ public class ServiceMail {
     }
 
     private void findCorrectCurators() {
+        foundCorrectCurators = new ArrayList<>();
         StatusCurator statusCurator = StatusCurator.OK;
         for (File curatorDir : Objects.requireNonNull(new File(Constants.curatorsDirectoryPath).listFiles())) {
             for (String bookkeeping : bookkeepingList) {
@@ -123,14 +121,14 @@ public class ServiceMail {
                     if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
                         statusCurator = StatusCurator.ALREADY_SEND;
                     }
-                    foundCorrectCurators.add(new CuratorsBookkeeping(curatorDir, email, statusCurator));
+                    foundCorrectCurators.add(new CuratorsBookkeeping(curatorDir, bookkeeping, email, statusCurator));
                 }
             }
         }
     }
 
     public void setBookkeepingList(String[] bookkeepingList) {
-        if (!Arrays.equals(this.bookkeepingList, bookkeepingList)){
+        if (!Arrays.equals(this.bookkeepingList, bookkeepingList)) {
             this.bookkeepingList = bookkeepingList;
             findCorrectCurators();
         }
@@ -139,5 +137,17 @@ public class ServiceMail {
     public List<CuratorsBookkeeping> getFoundCorrectCurators(String[] bookkeepingList) {
         setBookkeepingList(bookkeepingList);
         return foundCorrectCurators;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setBlackList(String[] blackList) {
+        this.blackList = blackList;
     }
 }

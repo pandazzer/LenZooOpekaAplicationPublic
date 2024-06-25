@@ -4,5 +4,5 @@ import OpekaLenZooApplication.OpekaLenZooApplication.zooMailing.ENUM.StatusCurat
 
 import java.io.File;
 
-public record CuratorsBookkeeping(File curator, String mailAddress, StatusCurator status) {
+public record CuratorsBookkeeping(File curator, String bookkeeping, String mailAddress, StatusCurator status) {
 }
