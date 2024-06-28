@@ -29,5 +29,6 @@ public interface Constants {
     String FILE_ALREADY_EXIST = "Файл уже существует";
     String VisitPersonExeption = "Некорректное имя подписанта";
     String NOT_MAIL_MESSAGE = "Почта не найдена в базе";
+    String EMPTY_FIELD = "Пустое поле";
 }
 

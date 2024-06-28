@@ -89,15 +89,6 @@ public class ServiceMail {
         }
     }
 
-
-    private void setBlackList(String[] blackList, String[] bookkeepingList) {
-        for (String path : blackList) {
-            for (String bookkeeping : bookkeepingList) {
-                repository.setBooleanTrueWithColumn(path, bookkeeping.replace("\\", "_"));
-            }
-        }
-    }
-
     private void findCorrectCurators() {
         foundCorrectCurators = new ArrayList<>();
         StatusCurator statusCurator = StatusCurator.OK;
@@ -115,7 +106,8 @@ public class ServiceMail {
                     if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
                         statusCurator = StatusCurator.ALREADY_SEND;
                     }
-                    if (blackList.contains(curatorDir.getName())) {
+                    String a = curatorDir.getName();
+                    if (!blackList.isEmpty() && blackList.contains(curatorDir.getName())) {
                         statusCurator = StatusCurator.IN_BLACK_LIST;
                     }
                     foundCorrectCurators.add(new CuratorsBookkeeping(curatorDir, bookkeeping, email, statusCurator));
@@ -125,14 +117,13 @@ public class ServiceMail {
     }
 
     public void setBookkeepingList(String[] bookkeepingList) {
-        if (!Arrays.equals(this.bookkeepingList, bookkeepingList)) {
-            this.bookkeepingList = bookkeepingList;
-            findCorrectCurators();
-        }
+        this.bookkeepingList = bookkeepingList;
     }
 
-    public List<CuratorsBookkeeping> getFoundCorrectCurators(String[] bookkeepingList) {
+    public List<CuratorsBookkeeping> getFoundCorrectCurators(String[] bookkeepingList, HashSet<String> blackListSet) {
+        setBlackList(blackListSet);
         setBookkeepingList(bookkeepingList);
+        findCorrectCurators();
         return foundCorrectCurators;
     }
 

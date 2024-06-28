@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 @FxmlView("/maket/12.fxml")
@@ -171,24 +172,36 @@ public class GenController {
     }
 
     private void handleSendButton() {
-        String subject = subjectField.getText();
-        String text = mailTextField.getText();
         String[] blackList = blackListArea.getText().split("\n");
         HashSet<String> blackListSet = new HashSet<>(Arrays.asList(blackList));
-        String[] bookkeepingList = directoryMailFilesField.getText().split(",");
-        if (isEmptyField(subject) || isEmptyField(text) || isEmptyField(bookkeepingList[0])) {
+        if (isEmptyFieldsForHandleSendButton()) {
+            showAlert(Constants.EMPTY_FIELD);
             return;
         }
-        serviceMail.setSubject(subject);
-        serviceMail.setText(text);
+        serviceMail.setSubject(subjectField.getText());
+        serviceMail.setText(mailTextField.getText());
         serviceMail.setBlackList(blackListSet);
-        serviceMail.setBookkeepingList(bookkeepingList);
-        serviceMail.startService( this);
+        serviceMail.setBookkeepingList(directoryMailFilesField.getText().split(","));
+        serviceMail.startService(this);
+    }
+
+    private boolean isEmptyFieldsForHandleSendButton() {
+        return subjectField.getText().isEmpty()
+                || mailTextField.getText().isEmpty()
+                || isEmptyFieldsForHandleCuratorsListButton();
+    }
+
+    private boolean isEmptyFieldsForHandleCuratorsListButton() {
+        return directoryMailFilesField.getText().isEmpty();
     }
 
     private void handleCuratorsListButton() {
         curratorsArea.clear();
         updateDB();
+        if (isEmptyFieldsForHandleCuratorsListButton()) {
+            showAlert(Constants.EMPTY_FIELD);
+            return;
+        }
         appendCorrectCuratorsToArea();
         sendButton.setDisable(false);
     }
@@ -202,7 +215,9 @@ public class GenController {
 
     private void appendCorrectCuratorsToArea() {
         String[] bookkeepingList = directoryMailFilesField.getText().split(",");
-        List<CuratorsBookkeeping> curatorsBookkeepingList = serviceMail.getFoundCorrectCurators(bookkeepingList);
+        String[] blackList = Stream.of(blackListArea.getText().split("\n")).map(String::trim).toArray(String[]::new);
+        HashSet<String> blackListSet = new HashSet<>(Arrays.asList(blackList));
+        List<CuratorsBookkeeping> curatorsBookkeepingList = serviceMail.getFoundCorrectCurators(bookkeepingList, blackListSet);
 
         for (CuratorsBookkeeping curatorsBookkeeping : curatorsBookkeepingList) {
             String name = curatorsBookkeeping.curator().getName();
