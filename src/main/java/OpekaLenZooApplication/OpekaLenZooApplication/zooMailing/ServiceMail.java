@@ -48,6 +48,7 @@ public class ServiceMail {
                     log.warn(name + " -> ");
                     listFilePath.stream().map(File::getName).forEach(log::warn);
                     genController.addLogText(name + " -> ");
+                    listFilePath.stream().map(File::getName).forEach(genController::addLogText);
                     setSendCorrect(name, bookkeepingExist);
                     correctSendCount++;
                 } catch (MessagingException e) {
