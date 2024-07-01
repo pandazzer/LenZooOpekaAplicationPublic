@@ -106,7 +106,6 @@ public class ServiceMail {
                     if (repository.isSend(path, bookkeeping.replace("\\", "_"))) {
                         statusCurator = StatusCurator.ALREADY_SEND;
                     }
-                    String a = curatorDir.getName();
                     if (!blackList.isEmpty() && blackList.contains(curatorDir.getName())) {
                         statusCurator = StatusCurator.IN_BLACK_LIST;
                     }
@@ -125,6 +124,10 @@ public class ServiceMail {
         setBookkeepingList(bookkeepingList);
         findCorrectCurators();
         return foundCorrectCurators;
+    }
+
+    private void setActualCorrectCurators() {
+
     }
 
     public void setSubject(String subject) {
