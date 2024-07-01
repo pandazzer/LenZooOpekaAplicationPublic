@@ -77,7 +77,7 @@ public class H2Repository {
             resultSet.next();
             return resultSet.getBoolean(1);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return false;
         }
     }
 

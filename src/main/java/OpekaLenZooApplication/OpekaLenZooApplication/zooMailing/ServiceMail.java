@@ -41,12 +41,13 @@ public class ServiceMail {
             String name = curatorsBookkeeping.curator().getName();
             String address = curatorsBookkeeping.mailAddress();
             bookkeepingExist = new ArrayList<>();
-            List<File> listFilePath = getListFilePath(curatorsBookkeeping.curator(), bookkeepingList);
+            List<File> listFilePath = getListFilePath(curatorsBookkeeping.curator());
             if (!listFilePath.isEmpty()) {
                 try {
                     sendMessage.send(address, subject, text, listFilePath);
                     log.warn(name + " -> ");
                     listFilePath.stream().map(File::getName).forEach(log::warn);
+                    genController.addLogText(name + " -> ");
                     setSendCorrect(name, bookkeepingExist);
                     correctSendCount++;
                 } catch (MessagingException e) {
@@ -56,15 +57,16 @@ public class ServiceMail {
                     throw new RuntimeException(e);
                 }
                 log.warn(String.format("%-50s - Отправка завершена", address));
-            } else {
-                alreadySendCount++;
             }
             genController.setSendMailProgressBar(sumCount / allFilesCount);
         }
-        genController.addLogText(String.format("%d - успешно отправлено%n%d - уже было отправлено", correctSendCount, alreadySendCount));
+        genController.addLogText(String.format("%d/%d - успешно отправлено%n%d - уже было отправлено"
+                , correctSendCount
+                , allFilesCount
+                , alreadySendCount));
     }
 
-    private List<File> getListFilePath(File curatorDir, String[] bookkeepingList) {
+    private List<File> getListFilePath(File curatorDir) {
         List<File> listFiles = new ArrayList<>();
         for (String bookkeeping : bookkeepingList) {
             File curBookkeeping = new File(curatorDir.getPath() + "\\" + bookkeeping);
@@ -91,9 +93,10 @@ public class ServiceMail {
 
     private void findCorrectCurators() {
         foundCorrectCurators = new ArrayList<>();
-        StatusCurator statusCurator = StatusCurator.OK;
+        StatusCurator statusCurator;
         for (File curatorDir : Objects.requireNonNull(new File(Constants.curatorsDirectoryPath).listFiles())) {
             for (String bookkeeping : bookkeepingList) {
+                statusCurator = StatusCurator.OK;
                 File curBookkeeping = new File(curatorDir.getPath() + "/" + bookkeeping);
                 String email = null;
                 if (curBookkeeping.exists()) {

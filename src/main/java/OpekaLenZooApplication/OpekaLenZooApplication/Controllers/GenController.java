@@ -111,6 +111,7 @@ public class GenController {
 
     @FXML
     void initialize() {
+
         staticLogText = logText;
         chBox.setItems(choiceBoxList);
         renameButton.setOnAction(e -> handleRenameButton());
@@ -122,6 +123,7 @@ public class GenController {
         cr.setOnAction(e -> handleCreateButton());
         clearLogs.setOnAction(e -> logText.clear());
         deleteScanButton.setOnAction(e -> handleDeleteScan());
+
     }
 
 
@@ -257,7 +259,7 @@ public class GenController {
             }
             if (isBookkeepingExist && countExist != bookkeepingList.size()) {
                 curratorsArea.appendText(String.format("%s нет:" + bookkeepingNotExist + "\n", curatorDir.getName()));
-            }//*
+            }
         }
     }
 
@@ -298,6 +300,10 @@ public class GenController {
                 , ButtonType.YES
                 , ButtonType.NO)
                 .showAndWait();
+    }
+
+    private void showWarning(String text) {
+        new Alert(Alert.AlertType.WARNING, text).showAndWait();
     }
 
     public void setRenameProgBar(double prog) {
